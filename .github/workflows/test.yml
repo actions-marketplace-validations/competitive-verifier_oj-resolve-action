@@ -20,6 +20,7 @@ jobs:
         with:
           include: examples/python
           cache-pip: true
+          install: true
       - name: Upload verify-files-json artifact2
         uses: ./
         with:
@@ -27,12 +28,11 @@ jobs:
             examples/java
             scripts
           artifact-name: verify-files-json-2
-          skip-install: true
       - name: Upload verify-files-json artifact-all
         uses: ./
         with:
           artifact-name: verify-files-json-all
-          skip-install: true
+          install: false
 
       - name: Download artifact
         uses: actions/download-artifact@v3

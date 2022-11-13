@@ -25,8 +25,8 @@ inputs:
     description: "Duration after which artifact will expire in days."
     required: false
     default: "1"
-  skip-install:
-    description: "If true, skip `pip install competitive-verifier`"
+  install:
+    description: "If true, run `pip install competitive-verifier`"
     required: false
     default: "false"
   cache-pip:
@@ -37,7 +37,7 @@ runs:
   using: composite
   steps:
     - name: Set up Python
-      if: ${{ !fromJson(inputs.skip-install )}}
+      if: fromJson(inputs.install)
       uses: actions/setup-python@v4
       with:
         python-version: "3.9"
@@ -66,7 +66,7 @@ runs:
 
     - name: Install competitive-verifier
       shell: bash
-      if: ${{ !fromJson(inputs.skip-install )}}
+      if: fromJson(inputs.install)
       run: pip install git+https://github.com/competitive-verifier/competitive-verifier.git@main
 
     - name: oj-resolve
