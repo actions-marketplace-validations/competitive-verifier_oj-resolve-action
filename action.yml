@@ -43,23 +43,23 @@ runs:
       if: startsWith(runner.os, 'Linux') && fromJson(inputs.cache-pip)
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-competitive-verifier
+        key: ${{ runner.os }}-pip-competitive-verifier-${{ github.sha }}
         restore-keys: |
-          ${{ runner.os }}-pip-
+          ${{ runner.os }}-pip-competitive-verifier-
     - uses: actions/cache@v3
       if: startsWith(runner.os, 'macOS') && fromJson(inputs.cache-pip)
       with:
         path: ~/Library/Caches/pip
-        key: ${{ runner.os }}-pip-competitive-verifier
+        key: ${{ runner.os }}-pip-competitive-verifier-${{ github.sha }}
         restore-keys: |
-          ${{ runner.os }}-pip-
+          ${{ runner.os }}-pip-competitive-verifier-
     - uses: actions/cache@v3
       if: startsWith(runner.os, 'Windows') && fromJson(inputs.cache-pip)
       with:
         path: ~\AppData\Local\pip\Cache
-        key: ${{ runner.os }}-pip-competitive-verifier
+        key: ${{ runner.os }}-pip-competitive-verifier-${{ github.sha }}
         restore-keys: |
-          ${{ runner.os }}-pip-
+          ${{ runner.os }}-pip-competitive-verifier-
 
     - name: Install competitive-verifier
       shell: bash
