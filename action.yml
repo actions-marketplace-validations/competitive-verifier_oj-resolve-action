@@ -85,7 +85,7 @@ runs:
         FILENAME: ${{ inputs.filename }}
 
     - name: Upload artifact
-      uses: actions/upload-artifact@main
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ inputs.artifact-name }}
         path: ${{ runner.temp }}/${{ inputs.filename }}
