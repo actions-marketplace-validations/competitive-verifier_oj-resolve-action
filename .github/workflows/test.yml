@@ -1,0 +1,66 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Upload verify-files-json artifact1
+        uses: ./
+        with:
+          include: examples/python
+          cache-pip: true
+      - name: Upload verify-files-json artifact2
+        uses: ./
+        with:
+          exclude: |
+            examples/java
+            scripts
+          artifact-name: verify-files-json-2
+          skip-install: true
+      - name: Upload verify-files-json artifact-all
+        uses: ./
+        with:
+          artifact-name: verify-files-json-all
+          skip-install: true
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ runner.os }}-verify-files-json
+          path: artifact
+      - name: Download artifact2
+        uses: actions/download-artifact@v3
+        with:
+          name: verify-files-json-2
+          path: artifact2
+      - name: Download artifact-all
+        uses: actions/download-artifact@v3
+        with:
+          name: verify-files-json-all
+          path: artifact-all
+
+      - name: Compare files
+        run: |
+          python scripts/input_diff.txt artifact/verify-files.json artifact2/verify-files.json
+        shell: bash
+      - name: Compare files all
+        run: |
+          python scripts/input_diff.txt artifact/verify-files.json artifact-all/verify-files.json --not-equal
+        shell: bash

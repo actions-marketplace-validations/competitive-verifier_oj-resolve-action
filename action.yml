@@ -17,13 +17,17 @@ inputs:
   artifact-name:
     description: The artifact name.
     required: false
-    default: verify-files-json
+    default: ${{ runner.os }}-verify-files-json
   retention-days:
     description: "Duration after which artifact will expire in days."
     required: false
     default: "1"
   skip-install:
-    description: "If true, "
+    description: "If true, skip `pip install competitive-verifier`"
+    required: false
+    default: "false"
+  cache-pip:
+    description: "If true, cache pip"
     required: false
     default: "false"
 runs:
@@ -34,6 +38,29 @@ runs:
       uses: actions/setup-python@v4
       with:
         python-version: "3.9"
+
+    - uses: actions/cache@v3
+      if: startsWith(runner.os, 'Linux') && fromJson(inputs.cache-pip)
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-competitive-verifier
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - uses: actions/cache@v3
+      if: startsWith(runner.os, 'macOS') && fromJson(inputs.cache-pip)
+      with:
+        path: ~/Library/Caches/pip
+        key: ${{ runner.os }}-pip-competitive-verifier
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - uses: actions/cache@v3
+      if: startsWith(runner.os, 'Windows') && fromJson(inputs.cache-pip)
+      with:
+        path: ~\AppData\Local\pip\Cache
+        key: ${{ runner.os }}-pip-competitive-verifier
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
     - name: Install competitive-verifier
       shell: bash
       if: ${{ !fromJson(inputs.skip-install )}}
