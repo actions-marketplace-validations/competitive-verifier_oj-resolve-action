@@ -1,6 +1,9 @@
 name: "competitive-verifier oj-resolve"
 description: "A composite action that competitive-verifier oj-resolve"
 author: "Kzrnm"
+branding:
+  color: blue
+  icon: target
 inputs:
   include:
     description: "Argument of oj-resolve --include."
