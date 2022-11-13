@@ -1,0 +1,56 @@
+name: "competitive-verifier oj-resolve"
+description: "A composite action that competitive-verifier oj-resolve"
+author: "Kzrnm"
+inputs:
+  include:
+    description: "Argument of oj-resolve --include."
+    required: false
+    default: ""
+  exclude:
+    description: "Argument of oj-resolve --exclude."
+    required: false
+    default: ""
+  filename:
+    description: "The file name of oj-resolve result json."
+    required: false
+    default: "verify-files.json"
+  artifact-name:
+    description: The artifact name.
+    required: false
+    default: verify-files-json
+  retention-days:
+    description: "Duration after which artifact will expire in days."
+    required: false
+    default: "1"
+  skip-install:
+    description: "If true, "
+    required: false
+    default: "false"
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      if: ${{ !fromJson(inputs.skip-install )}}
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.9"
+    - name: Install competitive-verifier
+      shell: bash
+      if: ${{ !fromJson(inputs.skip-install )}}
+      run: pip install git+https://github.com/competitive-verifier/competitive-verifier.git@main
+
+    - name: oj-resolve
+      shell: bash
+      run: |
+        competitive-verifier oj-resolve --include $include --exclude $exclude > "$RUNNER_TEMP/$FILENAME"
+      env:
+        include: ${{ inputs.include }}
+        exclude: ${{ inputs.exclude }}
+        FILENAME: ${{ inputs.filename }}
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@main
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ runner.temp }}/${{ inputs.filename }}
+        retention-days: ${{ inputs.retention-days }}
