@@ -29,13 +29,13 @@ jobs:
           exclude: |
             examples/java
             scripts
-          artifact-name: verify-files-json-2
+          verify-files-artifact-name: verify-files-json-2
       - name: Upload verify-files-json artifact-all
         id: upload-artifact-all
         uses: ./
         with:
-          artifact-name: verify-files-json-all
-          filename: verify-files-all.json
+          verify-files-artifact-name: verify-files-json-all
+          verify-files-name: verify-files-all.json
           install: false
 
       - name: Test upload-artifact1

@@ -17,11 +17,11 @@ inputs:
     description: "Duration after which artifact will expire in days."
     required: false
     default: "1"
-  filename:
+  verify-files-name:
     description: "The file name of oj-resolve result json."
     required: false
     default: "verify-files.json"
-  artifact-name:
+  verify-files-artifact-name:
     description: The name of artifact which contains verify files json.
     required: false
     default: ${{ runner.os }}-verify-files-json
@@ -82,11 +82,11 @@ runs:
       env:
         include: ${{ inputs.include }}
         exclude: ${{ inputs.exclude }}
-        FILENAME: ${{ inputs.filename }}
+        FILENAME: ${{ inputs.verify-files-name }}
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ inputs.artifact-name }}
-        path: ${{ runner.temp }}/${{ inputs.filename }}
+        name: ${{ inputs.verify-files-artifact-name }}
+        path: ${{ runner.temp }}/${{ inputs.verify-files-name }}
         retention-days: ${{ inputs.retention-days }}
