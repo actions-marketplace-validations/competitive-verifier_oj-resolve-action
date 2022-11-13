@@ -26,13 +26,17 @@ inputs:
     required: false
     default: ${{ runner.os }}-verify-files-json
   install:
-    description: "If true, run `pip install competitive-verifier`"
+    description: "If true, run `pip install competitive-verifier`."
     required: false
     default: "false"
   cache-pip:
-    description: "If true, cache pip"
+    description: "If true, this action cache pip."
     required: false
     default: "false"
+outputs:
+  json-path:
+    description: "The path of verify files json."
+    value: ${{ steps.resolve.outputs.json-path }}
 runs:
   using: composite
   steps:
@@ -71,8 +75,10 @@ runs:
 
     - name: oj-resolve
       shell: bash
+      id: resolve
       run: |
         competitive-verifier oj-resolve --include $include --exclude $exclude > "$RUNNER_TEMP/$FILENAME"
+        echo "json-path=$RUNNER_TEMP/$FILENAME" >> $GITHUB_OUTPUT
       env:
         include: ${{ inputs.include }}
         exclude: ${{ inputs.exclude }}

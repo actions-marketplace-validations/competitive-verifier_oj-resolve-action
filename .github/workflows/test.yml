@@ -16,12 +16,14 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Upload verify-files-json artifact1
+        id: upload-artifact1
         uses: ./
         with:
           include: examples/python
           cache-pip: true
           install: true
       - name: Upload verify-files-json artifact2
+        id: upload-artifact2
         uses: ./
         with:
           exclude: |
@@ -29,10 +31,18 @@ jobs:
             scripts
           artifact-name: verify-files-json-2
       - name: Upload verify-files-json artifact-all
+        id: upload-artifact-all
         uses: ./
         with:
           artifact-name: verify-files-json-all
+          filename: verify-files-all.json
           install: false
+
+      - name: Test json-path
+        run: |
+          [ "${{ steps.upload-artifact1.outputs.json-path }}" = "$RUNNER_TEMP/verify-files.json" ]
+          [ "${{ steps.upload-artifact2.outputs.json-path }}" = "$RUNNER_TEMP/verify-files.json" ]
+          [ "${{ steps.upload-artifact-all.outputs.json-path }}" = "$RUNNER_TEMP/verify-files-all.json" ]
 
       - name: Download artifact
         uses: actions/download-artifact@v3
@@ -56,5 +66,5 @@ jobs:
         shell: bash
       - name: Compare files all
         run: |
-          python scripts/input_diff.txt artifact/verify-files.json artifact-all/verify-files.json --not-equal
+          python scripts/input_diff.txt artifact/verify-files.json artifact-all/verify-files-all.json --not-equal
         shell: bash
