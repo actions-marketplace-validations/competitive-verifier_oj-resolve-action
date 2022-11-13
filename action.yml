@@ -18,7 +18,7 @@ inputs:
     required: false
     default: "verify-files.json"
   artifact-name:
-    description: The artifact name.
+    description: The name of artifact which contains verify files json.
     required: false
     default: ${{ runner.os }}-verify-files-json
   retention-days:
