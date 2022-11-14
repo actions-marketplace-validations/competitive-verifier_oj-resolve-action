@@ -18,8 +18,8 @@ See [action.yml](action.yml) or [competitive-verifier/competitive-verifier](http
             src/resource
             others/tests
 
-      # Resolve from all file
-      - name: oj-resolve
+      # Resolve from all files
+      - name: oj-resolve all files
         id: resolve
         uses: competitive-verifier/oj-resolve-action@v1
         with:
