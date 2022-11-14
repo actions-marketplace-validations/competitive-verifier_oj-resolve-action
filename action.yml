@@ -1,4 +1,4 @@
-name: "competitive-verifier oj-resolve"
+name: "oj-resolve"
 description: "A composite action that competitive-verifier oj-resolve"
 author: "Kzrnm"
 branding:
@@ -13,26 +13,10 @@ inputs:
     description: "Argument of oj-resolve --exclude."
     required: false
     default: ""
-  retention-days:
-    description: "Duration after which artifact will expire in days."
-    required: false
-    default: "1"
-  verify-files-name:
+  verify-files-path:
     description: "The file name of oj-resolve result json."
     required: false
-    default: "verify-files.json"
-  verify-files-artifact-name:
-    description: The name of artifact which contains verify files json.
-    required: false
-    default: ${{ runner.os }}-verify-files-json
-  install:
-    description: "If true, run `pip install competitive-verifier`."
-    required: false
-    default: "false"
-  cache-pip:
-    description: "If true, this action cache pip."
-    required: false
-    default: "false"
+    default: "./verify-files.json"
 outputs:
   json-path:
     description: "The path of verify files json."
@@ -40,53 +24,14 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Set up Python
-      if: fromJson(inputs.install)
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.9"
-
-    - uses: actions/cache@v3
-      if: startsWith(runner.os, 'Linux') && fromJson(inputs.cache-pip)
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-competitive-verifier-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-pip-competitive-verifier-
-    - uses: actions/cache@v3
-      if: startsWith(runner.os, 'macOS') && fromJson(inputs.cache-pip)
-      with:
-        path: ~/Library/Caches/pip
-        key: ${{ runner.os }}-pip-competitive-verifier-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-pip-competitive-verifier-
-    - uses: actions/cache@v3
-      if: startsWith(runner.os, 'Windows') && fromJson(inputs.cache-pip)
-      with:
-        path: ~\AppData\Local\pip\Cache
-        key: ${{ runner.os }}-pip-competitive-verifier-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-pip-competitive-verifier-
-
-    - name: Install competitive-verifier
-      shell: bash
-      if: fromJson(inputs.install)
-      run: pip install git+https://github.com/competitive-verifier/competitive-verifier.git@main
-
     - name: oj-resolve
       shell: bash
       id: resolve
       run: |
-        competitive-verifier oj-resolve --include $include --exclude $exclude > "$RUNNER_TEMP/$FILENAME"
-        echo "json-path=$RUNNER_TEMP/$FILENAME" >> $GITHUB_OUTPUT
+        competitive-verifier oj-resolve --include $include --exclude $exclude > "$OUTPUT_FILE"
+        cat "$OUTPUT_FILE"
+        echo "json-path=$OUTPUT_FILE" >> $GITHUB_OUTPUT
       env:
         include: ${{ inputs.include }}
         exclude: ${{ inputs.exclude }}
-        FILENAME: ${{ inputs.verify-files-name }}
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ inputs.verify-files-artifact-name }}
-        path: ${{ runner.temp }}/${{ inputs.verify-files-name }}
-        retention-days: ${{ inputs.retention-days }}
+        OUTPUT_FILE: ${{ inputs.verify-files-path }}

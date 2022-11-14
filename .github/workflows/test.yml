@@ -15,60 +15,40 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Upload verify-files-json artifact1
-        id: upload-artifact1
+      - name: Set up competitive-verifier
+        uses: competitive-verifier/setup-competitive-verifier@v1
+        with:
+          python-version: "3.9"
+
+      - name: oj-resolve with include
+        id: include
         uses: ./
         with:
           include: examples/python
-          cache-pip: true
-          install: true
-      - name: Upload verify-files-json artifact2
-        id: upload-artifact2
+      - name: oj-resolve with exclude
+        id: exclude
         uses: ./
         with:
           exclude: |
             examples/java
             scripts
-          verify-files-artifact-name: verify-files-json-2
-      - name: Upload verify-files-json artifact-all
-        id: upload-artifact-all
+          verify-files-path: ${{runner.temp}}/verify-files.json
+      - name: oj-resolve all
+        id: all
         uses: ./
         with:
-          verify-files-artifact-name: verify-files-json-all
-          verify-files-name: verify-files-all.json
-          install: false
-
-      - name: Test upload-artifact1
+          verify-files-path: verify-files-all.json
+      - name: Check path
         run: |
-          [ "${{ steps.upload-artifact1.outputs.json-path }}" = "$RUNNER_TEMP/verify-files.json" ]
-      - name: Test upload-artifact2
-        run: |
-          [ "${{ steps.upload-artifact2.outputs.json-path }}" = "$RUNNER_TEMP/verify-files.json" ]
-      - name: Test upload-artifact-all
-        run: |
-          [ "${{ steps.upload-artifact-all.outputs.json-path }}" = "$RUNNER_TEMP/verify-files-all.json" ]
-
-      - name: Download artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ runner.os }}-verify-files-json
-          path: artifact
-      - name: Download artifact2
-        uses: actions/download-artifact@v3
-        with:
-          name: verify-files-json-2
-          path: artifact2
-      - name: Download artifact-all
-        uses: actions/download-artifact@v3
-        with:
-          name: verify-files-json-all
-          path: artifact-all
+          test "${{steps.include.outputs.json-path}}" = "./verify-files.json"
+          test "${{steps.exclude.outputs.json-path}}" = "$RUNNER_TEMP/verify-files.json"
+          test "${{steps.all.outputs.json-path}}" = "verify-files-all.json"
 
       - name: Compare files
-        run: |
-          python scripts/input_diff.txt artifact/verify-files.json artifact2/verify-files.json
         shell: bash
+        run: |
+          python scripts/input_diff.txt "${{steps.include.outputs.json-path}}" "${{steps.exclude.outputs.json-path}}"
       - name: Compare files all
-        run: |
-          python scripts/input_diff.txt artifact/verify-files.json artifact-all/verify-files-all.json --not-equal
         shell: bash
+        run: |
+          python scripts/input_diff.txt "${{steps.include.outputs.json-path}}" "${{steps.all.outputs.json-path}}" --not-equal
