@@ -25,6 +25,7 @@ jobs:
         uses: ./
         with:
           include: examples/python
+          output-path: ./verify-files.json
       - name: oj-resolve with exclude
         id: exclude
         uses: ./
@@ -32,12 +33,12 @@ jobs:
           exclude: |
             examples/java
             scripts
-          verify-files-path: ${{runner.temp}}/verify-files.json
+          output-path: ${{runner.temp}}/verify-files.json
       - name: oj-resolve all
         id: all
         uses: ./
         with:
-          verify-files-path: verify-files-all.json
+          output-path: verify-files-all.json
       - name: Check path
         run: |
           test "${{steps.include.outputs.json-path}}" = "./verify-files.json"

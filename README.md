@@ -10,6 +10,7 @@ See [action.yml](action.yml) or [competitive-verifier/competitive-verifier](http
       - name: oj-resolve
         uses: competitive-verifier/oj-resolve-action@v1
         with:
+          output-path: ./verify.json
           include: |
             src
             others
@@ -21,8 +22,11 @@ See [action.yml](action.yml) or [competitive-verifier/competitive-verifier](http
       - name: oj-resolve
         id: resolve
         uses: competitive-verifier/oj-resolve-action@v1
+        with:
+          output-path: ./verify-all.json
 
       - name: Use resolved json
         run: |
-          echo ${{ steps.resolve.outputs.json-path }}
+          echo "${{ steps.resolve.outputs.json-path }}"
+          test "${{ steps.resolve.outputs.json-path }}" = "./verify-all.json"
 ```
