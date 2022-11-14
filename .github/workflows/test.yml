@@ -45,11 +45,16 @@ jobs:
           test "${{steps.exclude.outputs.json-path}}" = "$RUNNER_TEMP/verify-files.json"
           test "${{steps.all.outputs.json-path}}" = "verify-files-all.json"
 
-      - name: Compare files
-        shell: bash
-        run: |
-          python scripts/input_diff.txt "${{steps.include.outputs.json-path}}" "${{steps.exclude.outputs.json-path}}"
-      - name: Compare files all
-        shell: bash
-        run: |
-          python scripts/input_diff.txt "${{steps.include.outputs.json-path}}" "${{steps.all.outputs.json-path}}" --not-equal
+      - name: equal
+        uses: competitive-verifier/verifier-object-equality-action@v1
+        with:
+          class: VerificationInput
+          file1: ${{steps.include.outputs.json-path}}
+          file2: ${{steps.exclude.outputs.json-path}}
+      - name: Not equal
+        uses: competitive-verifier/verifier-object-equality-action@v1
+        with:
+          class: VerificationInput
+          file1: ${{steps.include.outputs.json-path}}
+          file2: ${{steps.all.outputs.json-path}}
+          not: true
