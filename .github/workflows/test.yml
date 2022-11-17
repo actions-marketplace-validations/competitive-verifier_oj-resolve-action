@@ -39,11 +39,23 @@ jobs:
         uses: ./
         with:
           output-path: verify-files-all.json
+      - name: oj-resolve with awk
+        id: awk
+        uses: ./
+        with:
+          include: examples/
+          config: examples/awk-config.toml
+          output-path: verify-files-with-awk.json
       - name: Check path
         run: |
           test "${{steps.include.outputs.json-path}}" = "./verify-files.json"
           test "${{steps.exclude.outputs.json-path}}" = "$RUNNER_TEMP/verify-files.json"
           test "${{steps.all.outputs.json-path}}" = "verify-files-all.json"
+          test "${{steps.awk.outputs.json-path}}" = "verify-files-with-awk.json"
+
+      - name: Check awk
+        run: |
+          cat "${{steps.awk.outputs.json-path}}" | jq '.files."examples/awk/circle.test.awk"' | grep "examples/awk/circle.awk"
 
       - name: equal
         uses: competitive-verifier/verifier-object-equality-action@v1
@@ -57,4 +69,11 @@ jobs:
           class: VerificationInput
           file1: ${{steps.include.outputs.json-path}}
           file2: ${{steps.all.outputs.json-path}}
+          not: true
+      - name: Not equal awk
+        uses: competitive-verifier/verifier-object-equality-action@v1
+        with:
+          class: VerificationInput
+          file1: ${{steps.include.outputs.json-path}}
+          file2: ${{steps.awk.outputs.json-path}}
           not: true

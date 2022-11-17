@@ -17,6 +17,10 @@ inputs:
     description: "Argument of oj-resolve --exclude."
     required: false
     default: ""
+  config:
+    description: "Argument of oj-resolve --config."
+    required: false
+    default: ""
 outputs:
   json-path:
     description: "The path of verify files json."
@@ -28,9 +32,10 @@ runs:
       shell: bash
       id: resolve
       run: |
-        competitive-verifier oj-resolve --include $include --exclude $exclude | tee "$OUTPUT_FILE"
+        competitive-verifier oj-resolve --include $include --exclude $exclude $config | tee "$OUTPUT_FILE"
         echo "json-path=$OUTPUT_FILE" >> $GITHUB_OUTPUT
       env:
         include: ${{ inputs.include }}
         exclude: ${{ inputs.exclude }}
+        config: ${{ (inputs.config != '') && '--config' || '' }} ${{inputs.config}}
         OUTPUT_FILE: ${{ inputs.output-path }}
